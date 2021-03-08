@@ -1,0 +1,448 @@
+openapi: 3.0.0
+info:
+  title: LINE WORKS API
+  description: |-
+    LINE WORKS Developers에서는 LINE WORKS의 데이터에 접근해 이를 제어할 수 있는 LINE WORKS Bot Platform에서 제공하는 API와 기술 문서를 확인하실 수 있습니다. LINE WORKS Bot Platform API를 이용해 LINE WORKS Bot Platform을 고객사의 시스템과 연동하여 활용할 수 있습니다.
+    LINE WORKS Bot Platform API 연동 개발에 필요한 설정은 [Developer Console](https://developers.worksmobile.com/console/openapi/main)에서 할 수 있습니다. [Community](https://forum.worksmobile.com/)에 연동 개발 중에 궁금한 사항을 문의하거나 다른 회사의 담당자들과 노하우를 공유할 수 있습니다. 또한 [공지사항](https://developers.worksmobile.com/notice)에 업데이트되는 API 정보도 확인할 수 있습니다.
+  version: 1.0.0
+  contact:
+    name: LINE WORKS Developers
+    url: 'https://developers.worksmobile.com/jp/'
+  termsOfService: 'https://developers.worksmobile.com/jp/policy/useAgreement?lang=ja'
+servers:
+  - url: 'https://apis.worksmobile.com'
+security:
+  - consumerKey: []
+  - Bearer: []
+tags:
+  - name: 서비스API
+    description: Authorization Code 을 획득하여 Access Token을 발급합니다.
+  - name: 서버API
+    description: consumerKey와 Authorization(Bearer 토큰)을 설정합니다
+paths:
+  '/r/{API_ID}/message/v1/bot':
+    post:
+      tags:
+        - 서버API
+      summary: 메시지 Bot 등록
+      description: |
+        고객사에서 사용할 메시지 Bot을 등록한다.
+
+        여기서 사용되는 메시지 Bot은 테넌트 기준으로 등록되기 때문에 각 도메인에서 사용하려면 메시지 Bot에 대한 도메인 등록 과정까지 마쳐야 한다.
+        즉, [메시지 Bot 등록 API](https://developers.worksmobile.com/document/1005002)와 [메시지 Bot 도메인 등록 API](https://developers.worksmobile.com/document/1005004)를 이용하여 테넌트와 도메인 둘 다 등록해야 사용할 수 있다.
+
+        메시지 Bot을 사용할 수 있는 도메인 범위를 지정할 수 있다.
+        도메인 범위가 전체 도메인 사용이 아니라면 지정된 도메인만 등록할 수 있다.
+
+        Bot은 다국어로 등록할 수 있다.
+        이름, 사진, 설명 부분을 다국어로 등록할 수 있으며 다국어로 등록된 내용은 클라이언트 언어 설정에 맞게 표시된다.
+
+        대화방 참여 형태를 지정할 수 있다.
+        기본값은 1:1 메시지이며, useGroupJoin 파라미터를 이용해 '팀/그룹, 1:N 메시지방 초대 가능' 옵션을 사용할 수 있다.
+
+        고객사의 메시지 수신 서버를 지정할 수 있다.
+        메시지 수신 서버는 HTTPS만 허용하며, 빈 문자열로 설정하면 callback을 보내지 않는다.
+        또한, 수신할 사용자 이벤트를 callbackEvents에 지정하여 선택적으로 받을 수 있다.
+        callbackEvents에 지정된 이벤트는 1:1 대화방의 하단 메뉴를 활성화할 수 있다.
+
+        > **주의**
+        > - Bot은 최대 300개까지 등록할 수 있다.
+        > - 이름 항목에 개행 문자를 입력하면 공백으로 치환된다.
+        > - callbackUrl에 자체 서명된 인증서는 허용되지 않는다.
+        > - 허용된 인증 기관 목록을 보려면 [CA 목록](https://static.worksmobile.net/static/wm/media/message-bot-api/ca_root_v1.txt)을 참고한다.
+
+        API 종류 : 서버 API
+      operationId: registerMessageBot
+      parameters: []
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+              examples:
+                example-1:
+                  value:
+                    - id: d290f1ee-6c54-4b01-90e6-d701748f0851
+                      name: Widget Adapter
+                      releaseDate: '2016-08-29T09:12:33.001Z'
+                      manufacturer:
+                        name: ACME Corporation
+                        homePage: 'https://www.acme-corp.com'
+                        phone: 408-867-5309
+        '400':
+          description: bad input parameter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                i18nNames:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/i18nNames'
+                photoUrl:
+                  type: string
+                  minLength: 1
+                i18nPhotoUrls:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/i18nPhotoUrls'
+                description:
+                  type: string
+                  minLength: 1
+                i18nDescriptions:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/i18nDescriptions'
+                managers:
+                  type: array
+                  items:
+                    type: string
+                submanagers:
+                  type: array
+                  items:
+                    type: string
+                useGroupJoin:
+                  type: boolean
+                useDomainScope:
+                  type: boolean
+                useCallback:
+                  type: boolean
+                callbackUrl:
+                  type: string
+                  minLength: 1
+                callbackEvents:
+                  type: array
+                  items: {}
+              required:
+                - name
+                - photoUrl
+                - description
+                - managers
+                - submanagers
+            examples:
+              example-1:
+                value:
+                  name: echo bot
+                  i18nNames:
+                    - language: ko_KR
+                      name: 에코봇
+                    - language: ja_JP
+                      name: エコボッ
+                  photoUrl: 'https://developers.worksmobile.com/favicon.png'
+                  i18nPhotoUrls:
+                    - language: ko_KR
+                      photoUrl: 'https://developers.worksmobile.com/favicon.png'
+                    - language: ja_JP
+                      photoUrl: 'https://developers.worksmobile.com/favicon.png'
+                  description: WorksMobile's A.I. conversation enabled bot
+                  i18nDescriptions:
+                    - language: ko_KR
+                      description: 웍스모바일의 A.I 대화가 가능한 봇
+                    - language: ja_JP
+                      description: ワークスモバイルのA.I対話が可能なボット
+                  managers:
+                    - manager@example.com
+                    - manager2@example.com
+                  submanagers:
+                    - submanager@example.com
+                  useGroupJoin: true
+                  useDomainScope: false
+                  useCallback: true
+                  callbackUrl: 'https://xxx'
+                  callbackEvents:
+                    - text
+                    - location
+                    - sticker
+                    - image
+                    - file
+        description: |-
+          {
+            "name": "echo bot",
+            "i18nNames": [{
+              "language": "ko_KR",
+              "name": "에코봇"
+            }, {
+              "language": "ja_JP",
+              "name": "エコボッ"
+            }],
+            "photoUrl": "https://developers.worksmobile.com/favicon.png",
+            "i18nPhotoUrls": [{
+              "language": "ko_KR",
+              "photoUrl": "https://developers.worksmobile.com/favicon.png"
+            },{
+              "language": "ja_JP",
+              "photoUrl": "https://developers.worksmobile.com/favicon.png"
+            }],
+            "description": "WorksMobile's A.I. conversation enabled bot",
+            "i18nDescriptions": [{
+              "language": "ko_KR",
+              "description": "웍스모바일의 A.I 대화가 가능한 봇"
+            },{
+              "language": "ja_JP",
+              "description": "ワークスモバイルのA.I対話が可能なボット"
+            }],
+            "managers": ["manager@example.com", "manager2@example.com"],
+            "submanagers": ["submanager@example.com"],
+            "useGroupJoin": true,
+            "useDomainScope": false,
+            "useCallback": true,
+            "callbackUrl": "https://xxx",
+            "callbackEvents": ["text", "location", "sticker", "image", "file"]
+          }
+    parameters:
+      - schema:
+          type: string
+        name: API_ID
+        in: path
+        required: true
+        description: API ID를 아직 발급받지 않았다면 Developer Console에서 발급을 클릭해 발급받는다.
+    get:
+      summary: 메시지 Bot 목록 조회
+      operationId: get-r-API-ID-message-v1-bot
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  bots:
+                    type: array
+                    uniqueItems: true
+                    minItems: 1
+                    items:
+                      type: object
+                      properties:
+                        botNo:
+                          type: number
+                        name:
+                          type: string
+                          minLength: 1
+                        photoUrl:
+                          type: string
+                          minLength: 1
+                        i18nNames:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/i18nNames'
+                        i18nPhotoUrls:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/i18nPhotoUrls'
+              examples:
+                example-1:
+                  value:
+                    bots:
+                      - botNo: 0
+                        name: string
+                        photoUrl: string
+                        i18nNames:
+                          - {}
+                        i18nPhotoUrls:
+                          - {}
+      description: 등록되어 있는 메시지 Bot 목록을 조회한다.
+      tags:
+        - 서버API
+components:
+  schemas:
+    InventoryItem:
+      required:
+        - id
+        - manufacturer
+        - name
+        - releaseDate
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        name:
+          type: string
+          example: Widget Adapter
+        releaseDate:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+        manufacturer:
+          $ref: '#/components/schemas/Manufacturer'
+    Manufacturer:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: ACME Corporation
+        homePage:
+          type: string
+          format: url
+          example: 'https://www.acme-corp.com'
+        phone:
+          type: string
+          example: 408-867-5309
+    richmenus:
+      title: richmenus
+      type: object
+      properties:
+        richMenuId:
+          type: string
+        size:
+          type: object
+          properties:
+            width:
+              type: number
+            height:
+              type: number
+        name:
+          type: string
+        areas:
+          type: object
+          properties:
+            bounds:
+              type: object
+              properties:
+                x:
+                  type: number
+                'y':
+                  type: number
+                width:
+                  type: number
+                height:
+                  type: number
+            action:
+              $ref: '#/components/schemas/ActionObject'
+    ActionObject:
+      title: ActionObject
+      type: object
+      description: |-
+        사용자가 메시지의 버튼이나 이미지를 눌렀을 때 Bot의 동작을 정의한다.
+
+        action object는 다음 메시지에서 사용된다.
+
+        - 메시지 전송 > 메시지 공통 속성 > Quick Reply
+        - 메시지 전송(Button Template)
+        - 메시지 전송(List Template)
+        - 메시지 전송(Carousel)
+        - 메시지 전송(Image Carousel)
+        - 메시지 Persistent Menu
+        - 메시지 Rich Menu
+
+        사용 가능한 동작은 다음과 같다.
+        - postback action
+        - message action
+        - URI action
+        - camera action
+        - camera roll action
+        - location action
+      properties:
+        type:
+          type: string
+        label:
+          type: string
+        data:
+          type: string
+        displayText:
+          type: string
+        i18nLabels:
+          type: object
+          properties:
+            language:
+              type: string
+            label:
+              type: string
+          required:
+            - language
+            - label
+        i18nDisplayTexts:
+          type: object
+          properties:
+            language:
+              type: string
+            displayText:
+              type: string
+          required:
+            - language
+            - displayText
+      required:
+        - type
+        - data
+    i18nNames:
+      title: i18nNames
+      type: object
+      description: 다국어 이름 목록
+      properties:
+        language:
+          type: string
+          description: |-
+            다국어 언어 코드
+            ￮ ko_KR ￮ ja_JP ￮ zh_CN ￮ zh_TW ￮ en_US
+        name:
+          type: string
+          description: "\t다국어 이름\n최대 글자수: 100자"
+      required:
+        - language
+        - name
+    i18nPhotoUrls:
+      title: i18nPhotoUrls
+      type: object
+      description: 다국어 이미지가 저장된 URL 목록
+      properties:
+        language:
+          type: string
+          description: |-
+            다국어 언어 코드
+            ￮ ko_KR ￮ ja_JP ￮ zh_CN ￮ zh_TW ￮ en_US
+        photoUrl:
+          type: string
+          description: |-
+            다국어 이미지가 저장된 URL
+            최대 글자수: 1000자
+      required:
+        - language
+        - photoUrl
+    i18nDescriptions:
+      title: i18nDescriptions
+      type: object
+      description: 다국어 메시지 Bot 설명 목록
+      properties:
+        language:
+          type: string
+          description: "\t다국어 언어 코드\n￮ ko_KR ￮ ja_JP ￮ zh_CN ￮ zh_TW ￮ en_US"
+        description:
+          type: string
+          description: |-
+            다국어 메시지 Bot 설명
+            최대 글자수: 100자
+      required:
+        - language
+        - description
+  securitySchemes:
+    consumerKey:
+      type: apiKey
+      name: consumerKey
+      in: header
+      description: Developer Console에서 발급한 값을 기입한다. Service API / Server API용 컨슈머키를 구분한다.
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: '''Bearer'' + 공백(space) + Token 을 기입한다. Token은  Developer Console에서 확인할 수 있다.'

@@ -1,0 +1,18 @@
+{
+  "items": [
+    {
+      "type": "item",
+      "title": "직급 추가",
+      "uri": "docs/조직연동-직급추가.md"
+    },
+    {
+      "type": "divider",
+      "title": "APIS"
+    },
+    {
+      "type": "item",
+      "title": "LINE WORKS API",
+      "uri": "tsubasateam-message-1.0.0-resolved.yaml"
+    }
+  ]
+}
